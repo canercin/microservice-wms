@@ -1,0 +1,31 @@
+### List stocks via Gateway
+GET http://localhost:8084/product/api/stocks
+
+### Get specific stock via Gateway
+GET http://localhost:8084/product/api/stocks/
+
+### Create stock via Gateway
+POST http://localhost:8084/product/api/stocks
+Content-Type: application/json
+
+{
+  "productId": "52e0c127-b548-448c-99c6-1178dcae2c2a",
+  "productName": "Stok Ürünü 1",
+  "warehouseId": "ffc133ad-6f3e-43c0-a6f5-effadedd12e2",
+  "quantity": 1500
+}
+
+### Update stock via Gateway
+PUT http://localhost:8084/product/api/stocks/20ec2405-bc5a-4d5c-a9e2-8927245e68bf
+Content-Type: application/json
+
+{
+  "id": "20ec2405-bc5a-4d5c-a9e2-8927245e68bf",
+  "productId": "52e0c127-b548-448c-99c6-1178dcae2c2a",
+  "productName": "Güncellenmiş Stok Ürünü 1",
+  "warehouseId": "ffc133ad-6f3e-43c0-a6f5-effadedd12e2",
+  "quantity": 5555
+}
+
+### Delete stock via Gateway
+DELETE http://localhost:8084/product/api/stocks/20ec2405-bc5a-4d5c-a9e2-8927245e68bf

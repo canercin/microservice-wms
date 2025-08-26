@@ -1,0 +1,29 @@
+### Create Product via Gateway
+POST http://localhost:8084/product/products
+Content-Type: application/json
+
+{
+  "code": "P-001",
+  "name": "Ürün 1",
+  "description": "Ürün 1 Açıklaması"
+}
+
+### List Products via Gateway
+GET http://localhost:8084/product/products
+
+### Get Specific Product via Gateway
+GET http://localhost:8084/product/products/747e9177-8d79-46ef-a44a-46ab9ac65821
+
+### Update Product via Gateway
+PUT http://localhost:8084/product/products/747e9177-8d79-46ef-a44a-46ab9ac65821
+Content-Type: application/json
+
+{
+    "id": "747e9177-8d79-46ef-a44a-46ab9ac65821",
+    "code": "P-002",
+    "name": "Güncellenmiş Ürün 1",
+    "description": "Güncellenmiş ürün açıklaması"
+}
+
+### Delete Product via Gateway
+DELETE http://localhost:8084/product/products/747e9177-8d79-46ef-a44a-46ab9ac65821

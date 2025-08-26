@@ -1,0 +1,11 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+name: microservice-wms
+services:
+  postgresql-warehouse:
+    extends:
+      file: ./warehouse/compose.yaml
+      service: postgres-warehouse
+  postgresql-product:
+    extends:
+      file: ./product/compose.yaml
+      service: postgres-product

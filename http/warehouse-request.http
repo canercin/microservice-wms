@@ -1,0 +1,29 @@
+### Create Warehouse via Gateway
+POST http://localhost:8084/warehouse/warehouses
+Content-Type: application/json
+
+{
+  "code": "W-1",
+  "name": "Birinci Depo",
+  "description": "Birinci Depo Açıklaması"
+}
+
+### List Warehouse via Gateway Gateway
+GET http://localhost:8084/warehouse/warehouses
+
+### Get Specific Warehouse via Gateway
+GET http://localhost:8084/warehouse/warehouses/0bf3167f-3fbb-4006-a4fd-8e7bdefaf873
+
+### Update Warehouse via Gateway
+PUT http://localhost:8084/warehouse/warehouses/0bf3167f-3fbb-4006-a4fd-8e7bdefaf873
+Content-Type: application/json
+
+{
+  "id": "0bf3167f-3fbb-4006-a4fd-8e7bdefaf873",
+  "code": "WH-002",
+  "name": "Updated Secondary Warehouse",
+  "description": "Güncellenmiş depo açıklaması"
+}
+
+### Delete Warehouse via Gateway
+DELETE http://localhost:8084/warehouse/warehouses/fb100293-eb6e-4f25-bce0-331083d2d639
