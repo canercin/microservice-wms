@@ -5,6 +5,7 @@ import dev.canercin.product.client.data.WarehouseData;
 import dev.canercin.product.entity.StockEntity;
 import dev.canercin.product.entity.ProductEntity;
 import dev.canercin.product.repository.StockRepository;
+import dev.canercin.product.service.ProductService;
 import dev.canercin.product.service.StockService;
 import dev.canercin.product.service.dto.StockData;
 import dev.canercin.product.service.mapper.impl.StockMapper;
@@ -21,12 +22,14 @@ public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final WarehouseClient warehouseClient;
     private final StockMapper stockMapper;
+    private final ProductService productService;
 
     @Autowired
-    public StockServiceImpl(StockRepository stockRepository, WarehouseClient warehouseClient, StockMapper stockMapper) {
+    public StockServiceImpl(StockRepository stockRepository, WarehouseClient warehouseClient, StockMapper stockMapper, ProductService productService) {
         this.stockRepository = stockRepository;
         this.warehouseClient = warehouseClient;
         this.stockMapper = stockMapper;
+        this.productService = productService;
     }
 
     @Override
@@ -66,6 +69,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public void deleteStock(UUID id) {
+        checkStockExists(id);
         stockRepository.deleteById(id);
     }
 
@@ -76,5 +80,11 @@ public class StockServiceImpl implements StockService {
         }
 
         throw new RuntimeException("Warehouse not found");
+    }
+
+    private void checkStockExists(UUID stockId) {
+        if (!stockRepository.existsById(stockId)) {
+            throw new IllegalArgumentException("Stock not found with id" + stockId);
+        }
     }
 }
