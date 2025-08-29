@@ -9,10 +9,11 @@ POST http://localhost:8084/product/api/stocks
 Content-Type: application/json
 
 {
-  "productId": "52e0c127-b548-448c-99c6-1178dcae2c2a",
-  "productName": "Stok Ürünü 1",
+  "product": {
+    "id": "43c10858-e28e-4e32-ae98-e635fe7b3f91"
+  },
   "warehouseId": "ffc133ad-6f3e-43c0-a6f5-effadedd12e2",
-  "quantity": 1500
+  "quantity": 2000
 }
 
 ### Update stock via Gateway

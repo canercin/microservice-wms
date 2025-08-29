@@ -4,44 +4,34 @@ import java.math.BigInteger;
 import java.util.UUID;
 
 public class StockData {
-    private UUID stockId;
-    private UUID productId;
-    private String productName;
+    private UUID id;
+    private ProductData product;
     private UUID warehouseId;
     private BigInteger quantity;
 
     public StockData() {}
 
-    public StockData(UUID stockId, UUID productId, String productName, UUID warehouseId, BigInteger quantity) {
-        this.stockId = stockId;
-        this.productId = productId;
-        this.productName = productName;
+    public StockData(UUID id, ProductData product, UUID warehouseId, BigInteger quantity) {
+        this.id = id;
+        this.product = product;
         this.warehouseId = warehouseId;
         this.quantity = quantity;
     }
 
-    public UUID getStockId() {
-        return stockId;
+    public UUID getId() {
+        return id;
     }
 
-    public void setStockId(UUID stockId) {
-        this.stockId = stockId;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public UUID getProductId() {
-        return productId;
+    public ProductData getProduct() {
+        return product;
     }
 
-    public void setProductId(UUID productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setProduct(ProductData product) {
+        this.product = product;
     }
 
     public UUID getWarehouseId() {
