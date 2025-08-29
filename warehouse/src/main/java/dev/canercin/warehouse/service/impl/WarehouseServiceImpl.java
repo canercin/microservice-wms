@@ -4,6 +4,7 @@ import dev.canercin.warehouse.entity.WarehouseEntity;
 import dev.canercin.warehouse.repository.WarehouseRepository;
 import dev.canercin.warehouse.service.WarehouseService;
 import dev.canercin.warehouse.service.dto.WarehouseData;
+import dev.canercin.warehouse.service.mapper.impl.WarehouseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,30 +17,32 @@ import java.util.stream.Collectors;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
+    private final WarehouseMapper warehouseMapper;
 
     @Autowired
-    public WarehouseServiceImpl(WarehouseRepository warehouseRepository) {
+    public WarehouseServiceImpl(WarehouseRepository warehouseRepository, WarehouseMapper warehouseMapper) {
         this.warehouseRepository = warehouseRepository;
+        this.warehouseMapper = warehouseMapper;
     }
 
     @Override
     public WarehouseData createWarehouse(WarehouseData warehouseData) {
-        WarehouseEntity entity = toEntity(warehouseData);
+        WarehouseEntity entity = warehouseMapper.toEntity(warehouseData);
         WarehouseEntity saved = warehouseRepository.save(entity);
-        return toDto(saved);
+        return warehouseMapper.toDto(saved);
     }
 
     @Override
     public WarehouseData getWarehouseById(UUID id) {
         return warehouseRepository.findById(id)
-                .map(this::toDto)
+                .map(warehouseMapper::toDto)
                 .orElse(null);
     }
 
     @Override
     public List<WarehouseData> getAllWarehouses() {
         return warehouseRepository.findAll().stream()
-                .map(this::toDto)
+                .map(warehouseMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -52,34 +55,21 @@ public class WarehouseServiceImpl implements WarehouseService {
             entity.setName(warehouseData.getName());
             entity.setDescription(warehouseData.getDescription());
             WarehouseEntity updated = warehouseRepository.save(entity);
-            return toDto(updated);
+            return warehouseMapper.toDto(updated);
         }
         return null;
     }
 
     @Override
     public void deleteWarehouse(UUID id) {
+        checkWarehouseExistence(id);
         warehouseRepository.deleteById(id);
     }
 
-    private WarehouseData toDto(WarehouseEntity entity) {
-        if (entity == null) return null;
-        WarehouseData dto = new WarehouseData();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        return dto;
-    }
-
-    private WarehouseEntity toEntity(WarehouseData dto) {
-        if (dto == null) return null;
-        WarehouseEntity entity = new WarehouseEntity();
-        entity.setId(dto.getId());
-        entity.setCode(dto.getCode());
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        return entity;
+    private void checkWarehouseExistence(UUID id) {
+        if (!warehouseRepository.existsById(id)) {
+            throw new IllegalArgumentException("Warehouse with ID " + id + " does not exist.");
+        }
     }
 }
 

@@ -7,6 +7,7 @@ import dev.canercin.product.entity.ProductEntity;
 import dev.canercin.product.repository.StockRepository;
 import dev.canercin.product.service.StockService;
 import dev.canercin.product.service.dto.StockData;
+import dev.canercin.product.service.mapper.impl.StockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,56 +20,30 @@ import java.util.stream.Collectors;
 public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final WarehouseClient warehouseClient;
+    private final StockMapper stockMapper;
 
     @Autowired
-    public StockServiceImpl(StockRepository stockRepository, WarehouseClient warehouseClient) {
+    public StockServiceImpl(StockRepository stockRepository, WarehouseClient warehouseClient, StockMapper stockMapper) {
         this.stockRepository = stockRepository;
         this.warehouseClient = warehouseClient;
-    }
-
-    private StockData toDto(StockEntity entity) {
-        if (entity == null) return null;
-        ProductEntity product = entity.getProduct();
-        return new StockData(
-            entity.getId(),
-            product != null ? product.getId() : null,
-            product != null ? product.getName() : null,
-            entity.getWarehouseId(),
-            entity.getQuantity()
-        );
-    }
-
-    private StockEntity toEntity(StockData dto) {
-        if (dto == null) return null;
-        StockEntity entity = new StockEntity();
-        entity.setId(dto.getStockId());
-        ProductEntity product = new ProductEntity();
-        product.setId(dto.getProductId());
-        entity.setProduct(product);
-        Optional<WarehouseData> warehouseDataOptional = warehouseClient.getWarehouse(dto.getWarehouseId());
-        if (warehouseDataOptional.isEmpty()) {
-            throw new IllegalArgumentException("Invalid warehouse ID: " + dto.getWarehouseId());
-        }
-        entity.setWarehouseId(dto.getWarehouseId());
-        entity.setQuantity(dto.getQuantity());
-        return entity;
+        this.stockMapper = stockMapper;
     }
 
     @Override
     public StockData createStock(StockData stockDto) {
-        StockEntity entity = toEntity(stockDto);
+        StockEntity entity = stockMapper.toEntity(stockDto);
         StockEntity saved = stockRepository.save(entity);
-        return toDto(saved);
+        return stockMapper.toDto(saved);
     }
 
     @Override
     public List<StockData> getAllStocks() {
-        return stockRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+        return stockRepository.findAll().stream().map(stockMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public StockData getStockById(UUID id) {
-        return stockRepository.findById(id).map(this::toDto).orElse(null);
+        return stockRepository.findById(id).map(stockMapper::toDto).orElse(null);
     }
 
     @Override
@@ -76,15 +51,15 @@ public class StockServiceImpl implements StockService {
         Optional<StockEntity> existing = stockRepository.findById(id);
         if (existing.isPresent()) {
             StockEntity entity = existing.get();
-            entity.setWarehouseId(stockDto.getWarehouseId());
+            entity.setWarehouseId(this.getWarehouse(stockDto.getWarehouseId()).getId());
             entity.setQuantity(stockDto.getQuantity());
             // Product güncellemesi
             ProductEntity product = entity.getProduct();
             if (product == null) product = new ProductEntity();
-            product.setId(stockDto.getProductId());
+            product.setId(stockDto.getProduct().getId());
             entity.setProduct(product);
             StockEntity updated = stockRepository.save(entity);
-            return toDto(updated);
+            return stockMapper.toDto(updated);
         }
         return null;
     }
@@ -92,5 +67,14 @@ public class StockServiceImpl implements StockService {
     @Override
     public void deleteStock(UUID id) {
         stockRepository.deleteById(id);
+    }
+
+    private WarehouseData getWarehouse(UUID warehouseId) {
+        Optional<WarehouseData> warehouseDataOptional = warehouseClient.getWarehouse(warehouseId);
+        if (warehouseDataOptional.isPresent()) {
+            return warehouseDataOptional.get();
+        }
+
+        throw new RuntimeException("Warehouse not found");
     }
 }

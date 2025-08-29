@@ -4,6 +4,7 @@ import dev.canercin.product.entity.ProductEntity;
 import dev.canercin.product.repository.ProductRepository;
 import dev.canercin.product.service.ProductService;
 import dev.canercin.product.service.dto.ProductData;
+import dev.canercin.product.service.mapper.impl.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,30 +17,32 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     @Override
     public ProductData createProduct(ProductData productData) {
-        ProductEntity entity = toEntity(productData);
+        ProductEntity entity = productMapper.toEntity(productData);
         ProductEntity saved = productRepository.save(entity);
-        return toDto(saved);
+        return productMapper.toDto(saved);
     }
 
     @Override
     public ProductData getProductById(UUID id) {
         return productRepository.findById(id)
-                .map(this::toDto)
+                .map(productMapper::toDto)
                 .orElse(null);
     }
 
     @Override
     public List<ProductData> getAllProducts() {
         return productRepository.findAll().stream()
-                .map(this::toDto)
+                .map(productMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -52,33 +55,20 @@ public class ProductServiceImpl implements ProductService {
             entity.setName(productData.getName());
             entity.setDescription(productData.getDescription());
             ProductEntity updated = productRepository.save(entity);
-            return toDto(updated);
+            return productMapper.toDto(updated);
         }
         return null;
     }
 
     @Override
     public void deleteProduct(UUID id) {
+        checkProductExists(id);
         productRepository.deleteById(id);
     }
 
-    private ProductData toDto(ProductEntity entity) {
-        if (entity == null) return null;
-        ProductData dto = new ProductData();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        return dto;
-    }
-
-    private ProductEntity toEntity(ProductData dto) {
-        if (dto == null) return null;
-        ProductEntity entity = new ProductEntity();
-        entity.setId(dto.getId());
-        entity.setCode(dto.getCode());
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        return entity;
+    private void checkProductExists(UUID id) {
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
     }
 }
