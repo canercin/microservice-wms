@@ -2,14 +2,15 @@ package dev.canercin.product.service.impl;
 
 import dev.canercin.product.client.WarehouseClient;
 import dev.canercin.product.client.data.WarehouseData;
-import dev.canercin.product.entity.StockEntity;
 import dev.canercin.product.entity.ProductEntity;
+import dev.canercin.product.entity.StockEntity;
 import dev.canercin.product.repository.StockRepository;
-import dev.canercin.product.service.ProductService;
 import dev.canercin.product.service.StockService;
 import dev.canercin.product.service.dto.StockData;
 import dev.canercin.product.service.mapper.impl.StockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,14 +23,14 @@ public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final WarehouseClient warehouseClient;
     private final StockMapper stockMapper;
-    private final ProductService productService;
+    private final MessageSource messageSource;
 
     @Autowired
-    public StockServiceImpl(StockRepository stockRepository, WarehouseClient warehouseClient, StockMapper stockMapper, ProductService productService) {
+    public StockServiceImpl(StockRepository stockRepository, WarehouseClient warehouseClient, StockMapper stockMapper, MessageSource messageSource) {
         this.stockRepository = stockRepository;
         this.warehouseClient = warehouseClient;
         this.stockMapper = stockMapper;
-        this.productService = productService;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -79,12 +80,12 @@ public class StockServiceImpl implements StockService {
             return warehouseDataOptional.get();
         }
 
-        throw new RuntimeException("Warehouse not found");
+        throw new RuntimeException(messageSource.getMessage("warehouse.not-found.id", new Object[]{warehouseId}, LocaleContextHolder.getLocale()));
     }
 
     private void checkStockExists(UUID stockId) {
         if (!stockRepository.existsById(stockId)) {
-            throw new IllegalArgumentException("Stock not found with id" + stockId);
+            throw new IllegalArgumentException(messageSource.getMessage("stock.not-found.id", new Object[]{stockId}, LocaleContextHolder.getLocale()));
         }
     }
 }
