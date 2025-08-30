@@ -6,6 +6,8 @@ import dev.canercin.product.service.ProductService;
 import dev.canercin.product.service.dto.ProductData;
 import dev.canercin.product.service.mapper.impl.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +20,13 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final MessageSource messageSource;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, MessageSource messageSource) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
 
     private void checkProductExists(UUID id) {
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found with id: " + id);
+            throw new RuntimeException(messageSource.getMessage("product.not-found.id", new Object[]{id}, LocaleContextHolder.getLocale()));
         }
     }
 }

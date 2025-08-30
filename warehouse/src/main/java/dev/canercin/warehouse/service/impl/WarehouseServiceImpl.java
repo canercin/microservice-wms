@@ -6,6 +6,8 @@ import dev.canercin.warehouse.service.WarehouseService;
 import dev.canercin.warehouse.service.dto.WarehouseData;
 import dev.canercin.warehouse.service.mapper.impl.WarehouseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +20,13 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
+    private final MessageSource messageSource;
 
     @Autowired
-    public WarehouseServiceImpl(WarehouseRepository warehouseRepository, WarehouseMapper warehouseMapper) {
+    public WarehouseServiceImpl(WarehouseRepository warehouseRepository, WarehouseMapper warehouseMapper, MessageSource messageSource) {
         this.warehouseRepository = warehouseRepository;
         this.warehouseMapper = warehouseMapper;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     private void checkWarehouseExistence(UUID id) {
         if (!warehouseRepository.existsById(id)) {
-            throw new IllegalArgumentException("Warehouse with ID " + id + " does not exist.");
+            throw new IllegalArgumentException(messageSource.getMessage("warehouse.not-found.id", new Object[]{id}, LocaleContextHolder.getLocale()));
         }
     }
 }
